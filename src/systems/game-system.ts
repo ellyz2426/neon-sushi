@@ -495,6 +495,15 @@ export class EnvironmentSystem extends createSystem({}) {
 
     // Bonsai tree decoration
     this.buildBonsai(scene);
+
+    // Tatami floor pattern
+    this.buildTatamiFloor(scene);
+
+    // Shoji screens
+    this.buildShojiScreens(scene);
+
+    // Koi pond
+    this.buildKoiPond(scene);
   }
 
   private buildConveyor(scene: Object3D) {
@@ -882,6 +891,150 @@ export class EnvironmentSystem extends createSystem({}) {
     scene.add(bonsaiGroup);
   }
 
+  private buildTatamiFloor(scene: Object3D) {
+    // Replace plain floor with tatami-style pattern
+    const tatamiMat = new MeshStandardMaterial({ color: 0x2a1e10, roughness: 0.85 });
+    const borderMat = new MeshStandardMaterial({ color: 0x1a0e06, roughness: 0.9 });
+
+    // Tatami mat tiles
+    for (let row = -2; row <= 2; row++) {
+      for (let col = -2; col <= 2; col++) {
+        const mat = new Mesh(new BoxGeometry(1.8, 0.01, 0.9), tatamiMat);
+        mat.position.set(col * 2.0, 0.005, row * 1.0 + 2.0);
+        if ((row + col) % 2 === 0) mat.rotation.y = Math.PI / 2;
+        scene.add(mat);
+
+        // Border strip
+        const border = new Mesh(new BoxGeometry(1.82, 0.012, 0.03), borderMat);
+        border.position.set(col * 2.0, 0.006, row * 1.0 + 2.0 + 0.45);
+        if ((row + col) % 2 === 0) border.rotation.y = Math.PI / 2;
+        scene.add(border);
+      }
+    }
+  }
+
+  private buildShojiScreens(scene: Object3D) {
+    // Shoji screen partitions on sides
+    const frameMat = new MeshStandardMaterial({ color: 0x4a3520, roughness: 0.7 });
+    const paperMat = new MeshStandardMaterial({
+      color: 0xeee8d5,
+      roughness: 0.95,
+      transparent: true,
+      opacity: 0.25,
+      emissive: 0xffeecc,
+      emissiveIntensity: 0.1,
+      side: DoubleSide,
+    });
+
+    // Left screen
+    for (let i = 0; i < 3; i++) {
+      const screenGroup = new Group();
+      screenGroup.position.set(-5.5, 0, -1 + i * 1.5);
+
+      // Frame
+      const topBar = new Mesh(new BoxGeometry(1.2, 0.03, 0.03), frameMat);
+      topBar.position.y = 2.5;
+      screenGroup.add(topBar);
+
+      const bottomBar = new Mesh(new BoxGeometry(1.2, 0.03, 0.03), frameMat);
+      bottomBar.position.y = 0.3;
+      screenGroup.add(bottomBar);
+
+      const leftPost = new Mesh(new BoxGeometry(0.03, 2.2, 0.03), frameMat);
+      leftPost.position.set(-0.6, 1.4, 0);
+      screenGroup.add(leftPost);
+
+      const rightPost = new Mesh(new BoxGeometry(0.03, 2.2, 0.03), frameMat);
+      rightPost.position.set(0.6, 1.4, 0);
+      screenGroup.add(rightPost);
+
+      // Paper
+      const paper = new Mesh(new PlaneGeometry(1.14, 2.14), paperMat);
+      paper.position.set(0, 1.4, 0);
+      paper.rotation.y = Math.PI / 2;
+      screenGroup.add(paper);
+
+      // Cross members
+      const crossH = new Mesh(new BoxGeometry(1.14, 0.015, 0.015), frameMat);
+      crossH.position.set(0, 1.4, 0);
+      screenGroup.add(crossH);
+
+      const crossV = new Mesh(new BoxGeometry(0.015, 2.14, 0.015), frameMat);
+      crossV.position.set(0, 1.4, 0);
+      screenGroup.add(crossV);
+
+      scene.add(screenGroup);
+    }
+  }
+
+  private buildKoiPond(scene: Object3D) {
+    // Small decorative koi pond in the corner
+    const pondGroup = new Group();
+    pondGroup.position.set(-3.5, 0.01, 2.5);
+
+    // Pond base (dark)
+    const pondBase = new Mesh(
+      new CylinderGeometry(0.5, 0.5, 0.02, 24),
+      new MeshStandardMaterial({
+        color: 0x1a3344,
+        roughness: 0.2,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.7,
+      })
+    );
+    pondGroup.add(pondBase);
+
+    // Pond rim (stone)
+    const rim = new Mesh(
+      new TorusGeometry(0.5, 0.04, 8, 24),
+      new MeshStandardMaterial({ color: 0x555555, roughness: 0.8 })
+    );
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = 0.02;
+    pondGroup.add(rim);
+
+    // Lily pads
+    for (let i = 0; i < 3; i++) {
+      const angle = (i / 3) * Math.PI * 2 + 0.3;
+      const r = 0.2 + Math.random() * 0.15;
+      const lily = new Mesh(
+        new CylinderGeometry(0.06, 0.06, 0.005, 12),
+        new MeshStandardMaterial({
+          color: 0x2a6a2a,
+          roughness: 0.8,
+        })
+      );
+      lily.position.set(Math.cos(angle) * r, 0.015, Math.sin(angle) * r);
+      pondGroup.add(lily);
+    }
+
+    // Koi fish (small colored shapes)
+    const koiColors = [0xff6622, 0xffcc44, 0xffffff];
+    for (let i = 0; i < 3; i++) {
+      const koi = new Mesh(
+        new SphereGeometry(0.02, 6, 4),
+        new MeshStandardMaterial({
+          color: koiColors[i],
+          emissive: koiColors[i],
+          emissiveIntensity: 0.2,
+        })
+      );
+      koi.scale.set(2, 0.5, 0.8);
+      const angle = (i / 3) * Math.PI * 2;
+      koi.position.set(Math.cos(angle) * 0.25, 0.01, Math.sin(angle) * 0.25);
+      koi.rotation.y = angle + Math.PI / 2;
+      pondGroup.add(koi);
+    }
+
+    // Pond light
+    const pondLight = new PointLight(0x44aaff, 0.2, 2);
+    pondLight.position.y = 0.1;
+    pondGroup.add(pondLight);
+
+    scene.add(pondGroup);
+  }
+
   spawnScorePopup(x: number, y: number, z: number, points: number) {
     // Visual floating score indicator
     const color = points >= 500 ? 0xffdd44 : points >= 200 ? 0x44ddff : 0x44ff88;
@@ -937,14 +1090,19 @@ export class EnvironmentSystem extends createSystem({}) {
         geo = new BoxGeometry(0.12, 0.005, 0.08);
         color = 0x1a3a1a;
         break;
-      case 'fish':
+      case 'fish': {
         geo = new BoxGeometry(0.08, 0.02, 0.04);
-        color = 0xff6644;
+        // Use correct fish color based on current order
+        const order = systemRefs.game?.state.currentOrder;
+        color = order ? (FISH_COLORS[order.fish] ?? 0xff6644) : 0xff6644;
         break;
-      case 'topping':
+      }
+      case 'topping': {
         geo = new SphereGeometry(0.02, 8, 6);
-        color = 0x88cc44;
+        const topOrder = systemRefs.game?.state.currentOrder;
+        color = topOrder ? (TOPPING_COLORS[topOrder.topping] ?? 0x88cc44) : 0x88cc44;
         break;
+      }
       default:
         geo = new BoxGeometry(0.05, 0.03, 0.05);
         color = 0xcccccc;
