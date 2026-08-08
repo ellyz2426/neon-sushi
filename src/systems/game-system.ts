@@ -28,6 +28,7 @@ import {
   DoubleSide,
   MeshBasicMaterial,
   AdditiveBlending,
+  ConeGeometry,
 } from '@iwsdk/core';
 
 // ============================================================
@@ -409,6 +410,8 @@ export class EnvironmentSystem extends createSystem({}) {
   private chopstickL: Mesh | null = null;
   private chopstickR: Mesh | null = null;
   private neonSigns: Mesh[] = [];
+  private manekiPaw: Mesh | null = null;
+  private rainDrops: Group | null = null;
   private customers: { group: Group; bobPhase: number }[] = [];
   private scorePopups: { mesh: Mesh; age: number; vy: number }[] = [];
   private stationLabels: Map<string, Mesh> = new Map();
@@ -504,6 +507,15 @@ export class EnvironmentSystem extends createSystem({}) {
 
     // Koi pond
     this.buildKoiPond(scene);
+
+    // Lucky cat
+    this.buildManekiNeko(scene);
+
+    // Rain effect
+    this.buildRainEffect(scene);
+
+    // Chopsticks on counter
+    this.buildChopsticks(scene);
   }
 
   private buildConveyor(scene: Object3D) {
@@ -1103,6 +1115,109 @@ export class EnvironmentSystem extends createSystem({}) {
     scene.add(pondGroup);
   }
 
+  private buildManekiNeko(scene: Object3D) {
+    // Lucky cat by the register
+    const catGroup = new Group();
+    catGroup.position.set(3.8, 0.9, -0.6);
+
+    // Body
+    const body = new Mesh(
+      new CylinderGeometry(0.08, 0.1, 0.15, 12),
+      new MeshStandardMaterial({ color: 0xf5deb3, roughness: 0.6 })
+    );
+    catGroup.add(body);
+
+    // Head
+    const head = new Mesh(
+      new SphereGeometry(0.07, 12, 8),
+      new MeshStandardMaterial({ color: 0xf5deb3, roughness: 0.6 })
+    );
+    head.position.y = 0.11;
+    catGroup.add(head);
+
+    // Eyes
+    for (let side = -1; side <= 1; side += 2) {
+      const eye = new Mesh(
+        new SphereGeometry(0.008, 6, 4),
+        new MeshBasicMaterial({ color: 0x222222 })
+      );
+      eye.position.set(side * 0.03, 0.13, 0.06);
+      catGroup.add(eye);
+    }
+
+    // Raised paw
+    const paw = new Mesh(
+      new CylinderGeometry(0.02, 0.02, 0.08, 8),
+      new MeshStandardMaterial({ color: 0xf5deb3, roughness: 0.6 })
+    );
+    paw.position.set(0.07, 0.1, 0.05);
+    paw.rotation.z = -0.3;
+    catGroup.add(paw);
+    this.manekiPaw = paw;
+
+    // Collar bell
+    const bell = new Mesh(
+      new SphereGeometry(0.015, 8, 6),
+      new MeshStandardMaterial({ color: 0xffdd44, metalness: 0.6, roughness: 0.3 })
+    );
+    bell.position.set(0, 0.07, 0.07);
+    catGroup.add(bell);
+
+    // Ears
+    for (let side = -1; side <= 1; side += 2) {
+      const ear = new Mesh(
+        new ConeGeometry(0.02, 0.03, 6),
+        new MeshStandardMaterial({ color: 0xf5deb3, roughness: 0.6 })
+      );
+      ear.position.set(side * 0.04, 0.18, 0);
+      catGroup.add(ear);
+    }
+
+    scene.add(catGroup);
+  }
+
+  private buildRainEffect(scene: Object3D) {
+    // Rain droplets visible through windows (outside the restaurant)
+    const rainGroup = new Group();
+    rainGroup.position.set(0, 0, -4);
+
+    const dropMat = new MeshBasicMaterial({
+      color: 0x6688bb,
+      transparent: true,
+      opacity: 0.3,
+    });
+
+    for (let i = 0; i < 60; i++) {
+      const drop = new Mesh(new CylinderGeometry(0.003, 0.003, 0.06, 4), dropMat);
+      drop.position.set(
+        (Math.random() - 0.5) * 12,
+        Math.random() * 4,
+        (Math.random() - 0.5) * 2
+      );
+      rainGroup.add(drop);
+    }
+
+    this.rainDrops = rainGroup;
+    scene.add(rainGroup);
+  }
+
+  private buildChopsticks(scene: Object3D) {
+    // Decorative counter chopsticks (separate from assembly board ones)
+    const stickMat = new MeshStandardMaterial({ color: 0x4a3520, roughness: 0.6 });
+
+    const left = new Mesh(new CylinderGeometry(0.003, 0.002, 0.2, 6), stickMat);
+    left.position.set(2.0, 0.92, -0.2);
+    left.rotation.z = Math.PI / 2;
+    left.rotation.x = 0.1;
+    scene.add(left);
+
+    const right = new Mesh(new CylinderGeometry(0.003, 0.002, 0.2, 6), stickMat);
+    right.position.set(2.0, 0.92, -0.23);
+    right.rotation.z = Math.PI / 2;
+    right.rotation.x = -0.1;
+    scene.add(right);
+  }
+
   spawnScorePopup(x: number, y: number, z: number, points: number) {
     // Visual floating score indicator
     const color = points >= 500 ? 0xffdd44 : points >= 200 ? 0x44ddff : 0x44ff88;
@@ -1401,6 +1516,22 @@ export class EnvironmentSystem extends createSystem({}) {
       const mat = sign.material as MeshBasicMaterial;
       mat.opacity = 0.7 + Math.sin(this.lanternTime * 2) * 0.3;
     });
+
+    // Rain animation
+    if (this.rainDrops) {
+      this.rainDrops.children.forEach((drop) => {
+        drop.position.y -= delta * 3;
+        if (drop.position.y < -0.5) {
+          drop.position.y = 4 + Math.random() * 1;
+          drop.position.x = (Math.random() - 0.5) * 12;
+        }
+      });
+    }
+
+    // Maneki-neko paw wave
+    if (this.manekiPaw) {
+      this.manekiPaw.rotation.x = Math.sin(this.lanternTime * 3) * 0.4;
+    }
 
     // Animate customers idle bobbing
     this.customers.forEach((c) => {
