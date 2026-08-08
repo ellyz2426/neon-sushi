@@ -1,0 +1,125 @@
+<style>
+  .root {
+    flex-direction: column;
+    align-items: center;
+    padding: 30;
+    gap: 14;
+    background-color: rgba(10, 0, 0, 0.94);
+    border-radius: 16;
+    border-color: rgba(255, 80, 60, 0.6);
+    border-width: 2;
+    width: 420;
+  }
+  .title {
+    font-size: 28;
+    color: #ff4433;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 16;
+    color: #ffaa88;
+  }
+  .divider {
+    width: 340;
+    height: 1;
+    background-color: rgba(255, 80, 60, 0.3);
+  }
+  .stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 300;
+    padding: 4;
+  }
+  .stat-label {
+    font-size: 14;
+    color: #ff8866;
+  }
+  .stat-value {
+    font-size: 14;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .score-row {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 300;
+    padding: 6;
+  }
+  .score-label {
+    font-size: 20;
+    color: #ffdd44;
+    font-weight: 700;
+  }
+  .score-value {
+    font-size: 20;
+    color: #ffdd44;
+    font-weight: 700;
+  }
+  .high-score-label {
+    font-size: 12;
+    color: #888888;
+  }
+  .rank-label {
+    font-size: 16;
+    color: #44ddff;
+    font-weight: 600;
+  }
+  .btn {
+    padding: 14;
+    background-color: rgba(255, 60, 40, 0.15);
+    border-radius: 8;
+    border-color: rgba(255, 80, 60, 0.4);
+    border-width: 1;
+    width: 240;
+    align-items: center;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 16;
+    color: #ffffff;
+    font-weight: 600;
+  }
+</style>
+<Panel class="root">
+  <div class="title">SHIFT OVER</div>
+  <div class="subtitle" id="subtitle">Great work, Chef!</div>
+  <div class="divider"></div>
+  <div class="score-row">
+    <div class="score-label">FINAL SCORE</div>
+    <div class="score-value" id="final-score">0</div>
+  </div>
+  <div class="high-score-label" id="high-score">BEST: 0</div>
+  <div class="rank-label" id="rank">Apprentice</div>
+  <div class="divider"></div>
+  <div class="stat-row">
+    <div class="stat-label">Sushi Served</div>
+    <div class="stat-value" id="served">0</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-label">Orders Failed</div>
+    <div class="stat-value" id="failed">0</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-label">Best Combo</div>
+    <div class="stat-value" id="best-combo">x1</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-label">Waves Cleared</div>
+    <div class="stat-value" id="waves-cleared">0</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-label">Accuracy</div>
+    <div class="stat-value" id="accuracy">0%</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-label">Best Streak</div>
+    <div class="stat-value" id="best-streak">0</div>
+  </div>
+  <div class="divider"></div>
+  <div class="btn" id="btn-retry">
+    <div class="btn-text">NEXT SHIFT</div>
+  </div>
+  <div class="btn" id="btn-menu">
+    <div class="btn-text">QUIT</div>
+  </div>
+</Panel>

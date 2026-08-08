@@ -1,0 +1,73 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {
+    "com.iwsdk.components.DomeGradient": {
+      "sky": [0.02, 0.01, 0.04, 1],
+      "equator": [0.05, 0.02, 0.06, 1],
+      "ground": [0.03, 0.01, 0.03, 1],
+      "intensity": 0.6
+    },
+    "com.iwsdk.components.IBLGradient": {
+      "sky": [0.15, 0.08, 0.12, 1],
+      "equator": [0.2, 0.1, 0.08, 1],
+      "ground": [0.1, 0.05, 0.04, 1],
+      "intensity": 0.8
+    }
+  },
+  "resources": {},
+  "nodes": [
+    {
+      "id": "menu-panel",
+      "name": "Menu Panel",
+      "content": { "type": "asset", "asset": "menu-panel" },
+      "transform": { "position": [0, 1.5, -2], "scale": 0.4 },
+      "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "hud-panel",
+      "name": "HUD Panel",
+      "content": { "type": "asset", "asset": "hud-panel" },
+      "transform": { "position": [0, 2.4, -1.8], "scale": 0.35 },
+      "components": {
+        "RayInteractable": {},
+        "ScreenSpace": { "top": "10px", "left": "50%", "width": "40vw", "height": "10%" }
+      }
+    },
+    {
+      "id": "order-panel",
+      "name": "Order Panel",
+      "content": { "type": "asset", "asset": "order-panel" },
+      "transform": { "position": [1.8, 1.5, -1.2], "rotationDeg": [0, -30, 0], "scale": 0.35 },
+      "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "game-over-panel",
+      "name": "Game Over Panel",
+      "content": { "type": "asset", "asset": "game-over-panel" },
+      "transform": { "position": [0, 1.5, -2], "scale": 0.4 },
+      "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "settings-panel",
+      "name": "Settings Panel",
+      "content": { "type": "asset", "asset": "settings-panel" },
+      "transform": { "position": [0, 1.5, -2], "scale": 0.38 },
+      "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "recipe-panel",
+      "name": "Recipe Panel",
+      "content": { "type": "asset", "asset": "recipe-panel" },
+      "transform": { "position": [0, 1.5, -2], "scale": 0.38 },
+      "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "wave-panel",
+      "name": "Wave Panel",
+      "content": { "type": "asset", "asset": "wave-panel" },
+      "transform": { "position": [0, 1.6, -1.8], "scale": 0.4 },
+      "components": { "RayInteractable": {} }
+    }
+  ]
+}

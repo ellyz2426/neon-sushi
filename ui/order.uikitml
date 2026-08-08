@@ -1,0 +1,107 @@
+<style>
+  .root {
+    flex-direction: column;
+    align-items: center;
+    padding: 20;
+    gap: 10;
+    background-color: rgba(10, 0, 0, 0.92);
+    border-radius: 12;
+    border-color: rgba(255, 80, 60, 0.5);
+    border-width: 1;
+    width: 320;
+  }
+  .header {
+    font-size: 16;
+    color: #ff8866;
+    font-weight: 600;
+  }
+  .order-name {
+    font-size: 22;
+    color: #ffffff;
+    font-weight: 700;
+  }
+  .divider {
+    width: 260;
+    height: 1;
+    background-color: rgba(255, 80, 60, 0.3);
+  }
+  .step-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 8;
+    width: 260;
+    padding: 6;
+    border-radius: 6;
+  }
+  .step-active {
+    background-color: rgba(255, 100, 60, 0.2);
+    border-color: rgba(255, 100, 60, 0.4);
+    border-width: 1;
+  }
+  .step-done {
+    background-color: rgba(60, 200, 100, 0.15);
+  }
+  .step-num {
+    font-size: 12;
+    color: #ff8866;
+    font-weight: 600;
+    width: 20;
+  }
+  .step-text {
+    font-size: 14;
+    color: #ffffff;
+  }
+  .step-check {
+    font-size: 14;
+    color: #44dd88;
+  }
+  .rush-label {
+    font-size: 12;
+    color: #ff44ff;
+    font-weight: 700;
+  }
+  .bonus-label {
+    font-size: 12;
+    color: #ffdd44;
+    font-weight: 700;
+  }
+  .queue-header {
+    font-size: 11;
+    color: #888888;
+  }
+  .queue-item {
+    font-size: 12;
+    color: #aaaaaa;
+  }
+</style>
+<Panel class="root">
+  <div class="header">CURRENT ORDER</div>
+  <div class="order-name" id="order-name">SALMON NIGIRI</div>
+  <div class="rush-label" id="rush-label"> </div>
+  <div class="bonus-label" id="bonus-label"> </div>
+  <div class="divider"></div>
+  <div class="step-row step-active" id="step-1">
+    <div class="step-num">1</div>
+    <div class="step-text" id="step-1-text">Add Rice</div>
+    <div class="step-check" id="step-1-check"> </div>
+  </div>
+  <div class="step-row" id="step-2">
+    <div class="step-num">2</div>
+    <div class="step-text" id="step-2-text">Add Salmon</div>
+    <div class="step-check" id="step-2-check"> </div>
+  </div>
+  <div class="step-row" id="step-3">
+    <div class="step-num">3</div>
+    <div class="step-text" id="step-3-text"> </div>
+    <div class="step-check" id="step-3-check"> </div>
+  </div>
+  <div class="step-row" id="step-4">
+    <div class="step-num">4</div>
+    <div class="step-text" id="step-4-text"> </div>
+    <div class="step-check" id="step-4-check"> </div>
+  </div>
+  <div class="divider"></div>
+  <div class="queue-header">UP NEXT</div>
+  <div class="queue-item" id="queue-1"> </div>
+  <div class="queue-item" id="queue-2"> </div>
+</Panel>
