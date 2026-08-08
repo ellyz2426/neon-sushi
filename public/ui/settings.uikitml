@@ -1,0 +1,90 @@
+<style>
+  .root {
+    flex-direction: column;
+    align-items: center;
+    padding: 24;
+    gap: 12;
+    background-color: rgba(10, 0, 0, 0.94);
+    border-radius: 14;
+    border-color: rgba(255, 80, 60, 0.5);
+    border-width: 1;
+    width: 360;
+  }
+  .title {
+    font-size: 22;
+    color: #ff8866;
+    font-weight: 700;
+  }
+  .divider {
+    width: 300;
+    height: 1;
+    background-color: rgba(255, 80, 60, 0.3);
+  }
+  .option-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 280;
+    padding: 8;
+  }
+  .option-label {
+    font-size: 14;
+    color: #ffffff;
+  }
+  .toggle-btn {
+    padding: 6;
+    background-color: rgba(255, 60, 40, 0.2);
+    border-radius: 6;
+    border-color: rgba(255, 80, 60, 0.4);
+    border-width: 1;
+    width: 80;
+    align-items: center;
+    cursor: pointer;
+  }
+  .toggle-text {
+    font-size: 12;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .btn {
+    padding: 12;
+    background-color: rgba(255, 60, 40, 0.15);
+    border-radius: 8;
+    border-color: rgba(255, 80, 60, 0.4);
+    border-width: 1;
+    width: 200;
+    align-items: center;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 14;
+    color: #ffffff;
+    font-weight: 600;
+  }
+</style>
+<Panel class="root">
+  <div class="title">SETTINGS</div>
+  <div class="divider"></div>
+  <div class="option-row">
+    <div class="option-label">Difficulty</div>
+    <div class="toggle-btn" id="btn-difficulty">
+      <div class="toggle-text" id="difficulty-text">NORMAL</div>
+    </div>
+  </div>
+  <div class="option-row">
+    <div class="option-label">Sound FX</div>
+    <div class="toggle-btn" id="btn-sfx">
+      <div class="toggle-text" id="sfx-text">ON</div>
+    </div>
+  </div>
+  <div class="option-row">
+    <div class="option-label">Music</div>
+    <div class="toggle-btn" id="btn-music">
+      <div class="toggle-text" id="music-text">ON</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="btn" id="btn-back">
+    <div class="btn-text">BACK</div>
+  </div>
+</Panel>

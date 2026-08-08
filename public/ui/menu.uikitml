@@ -1,0 +1,55 @@
+<style>
+  .root {
+    flex-direction: column;
+    align-items: center;
+    padding: 30;
+    gap: 16;
+    background-color: rgba(10, 0, 0, 0.94);
+    border-radius: 16;
+    border-color: rgba(255, 80, 60, 0.6);
+    border-width: 2;
+    width: 420;
+  }
+  .title {
+    font-size: 36;
+    color: #ff4433;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 14;
+    color: #ffaa88;
+  }
+  .btn {
+    padding: 14;
+    background-color: rgba(255, 60, 40, 0.15);
+    border-radius: 8;
+    border-color: rgba(255, 80, 60, 0.4);
+    border-width: 1;
+    width: 280;
+    align-items: center;
+    cursor: pointer;
+  }
+  .btn-text {
+    font-size: 18;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .deco {
+    font-size: 48;
+    color: #ff6644;
+  }
+</style>
+<Panel class="root">
+  <div class="deco">🍣</div>
+  <div class="title" id="title">SUSHI MASTER</div>
+  <div class="subtitle">Conveyor Belt Arcade</div>
+  <div class="btn" id="btn-play">
+    <div class="btn-text">START SHIFT</div>
+  </div>
+  <div class="btn" id="btn-settings">
+    <div class="btn-text">SETTINGS</div>
+  </div>
+  <div class="btn" id="btn-recipe">
+    <div class="btn-text">RECIPES</div>
+  </div>
+</Panel>

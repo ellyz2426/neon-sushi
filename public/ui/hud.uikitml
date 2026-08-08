@@ -1,0 +1,88 @@
+<style>
+  .root {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10;
+    gap: 14;
+    background-color: rgba(10, 0, 0, 0.88);
+    border-radius: 10;
+    border-color: rgba(255, 80, 60, 0.4);
+    border-width: 1;
+    width: 500;
+    height: 60;
+  }
+  .stat-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 2;
+  }
+  .label {
+    font-size: 9;
+    color: #ff8866;
+  }
+  .value {
+    font-size: 18;
+    color: #ffffff;
+    font-weight: 700;
+  }
+  .combo-value {
+    font-size: 18;
+    color: #ffdd44;
+    font-weight: 700;
+  }
+  .wave-value {
+    font-size: 18;
+    color: #44ddff;
+    font-weight: 700;
+  }
+  .timer-value {
+    font-size: 18;
+    color: #ff4433;
+    font-weight: 700;
+  }
+  .lives-value {
+    font-size: 18;
+    color: #ff6655;
+    font-weight: 700;
+  }
+  .pause-btn {
+    padding: 6;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    width: 36;
+    height: 36;
+  }
+  .pause-text {
+    font-size: 14;
+    color: #ffffff;
+  }
+</style>
+<Panel class="root">
+  <div class="stat-group">
+    <div class="label">SCORE</div>
+    <div class="value" id="score">0</div>
+  </div>
+  <div class="stat-group">
+    <div class="label">WAVE</div>
+    <div class="wave-value" id="wave">1</div>
+  </div>
+  <div class="stat-group">
+    <div class="label">COMBO</div>
+    <div class="combo-value" id="combo">x1</div>
+  </div>
+  <div class="stat-group">
+    <div class="label">TIMER</div>
+    <div class="timer-value" id="timer">30</div>
+  </div>
+  <div class="stat-group">
+    <div class="label">LIVES</div>
+    <div class="lives-value" id="lives">3</div>
+  </div>
+  <div class="pause-btn" id="btn-pause">
+    <div class="pause-text">II</div>
+  </div>
+</Panel>
