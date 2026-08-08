@@ -409,6 +409,9 @@ export class EnvironmentSystem extends createSystem({}) {
   private chopstickL: Mesh | null = null;
   private chopstickR: Mesh | null = null;
   private neonSigns: Mesh[] = [];
+  private customers: { group: Group; bobPhase: number }[] = [];
+  private scorePopups: { mesh: Mesh; age: number; vy: number }[] = [];
+  private stationLabels: Map<string, Mesh> = new Map();
 
   init() {
     systemRefs.environment = this;
@@ -483,6 +486,15 @@ export class EnvironmentSystem extends createSystem({}) {
 
     // Lighting
     this.buildLighting(scene);
+
+    // Customers sitting at the counter
+    this.buildCustomers(scene);
+
+    // Station labels (floating text indicators)
+    this.buildStationLabels(scene);
+
+    // Bonsai tree decoration
+    this.buildBonsai(scene);
   }
 
   private buildConveyor(scene: Object3D) {
@@ -734,6 +746,170 @@ export class EnvironmentSystem extends createSystem({}) {
     scene.add(accentR);
   }
 
+  private buildCustomers(scene: Object3D) {
+    // Customer silhouettes sitting across the counter
+    const customerPositions = [
+      { x: -1.5, z: 0.8 },
+      { x: 0, z: 1.0 },
+      { x: 1.5, z: 0.8 },
+    ];
+    const customerColors = [0x443322, 0x332244, 0x223344];
+
+    customerPositions.forEach((pos, i) => {
+      const group = new Group();
+      group.position.set(pos.x, 0, pos.z);
+
+      // Body
+      const bodyMat = new MeshStandardMaterial({ color: customerColors[i], roughness: 0.8 });
+      const torso = new Mesh(new CylinderGeometry(0.15, 0.12, 0.5, 8), bodyMat);
+      torso.position.y = 0.9;
+      group.add(torso);
+
+      // Head
+      const head = new Mesh(new SphereGeometry(0.1, 10, 8), bodyMat);
+      head.position.y = 1.25;
+      group.add(head);
+
+      // Arms resting on counter
+      const armMat = new MeshStandardMaterial({ color: customerColors[i], roughness: 0.8 });
+      const armL = new Mesh(new CylinderGeometry(0.03, 0.03, 0.3, 6), armMat);
+      armL.position.set(-0.15, 0.85, -0.1);
+      armL.rotation.z = Math.PI / 3;
+      group.add(armL);
+      const armR = new Mesh(new CylinderGeometry(0.03, 0.03, 0.3, 6), armMat);
+      armR.position.set(0.15, 0.85, -0.1);
+      armR.rotation.z = -Math.PI / 3;
+      group.add(armR);
+
+      // Stool
+      const stoolSeat = new Mesh(
+        new CylinderGeometry(0.15, 0.15, 0.04, 12),
+        new MeshStandardMaterial({ color: 0x4a2a1a, roughness: 0.6 })
+      );
+      stoolSeat.position.y = 0.55;
+      group.add(stoolSeat);
+      const stoolLeg = new Mesh(
+        new CylinderGeometry(0.03, 0.04, 0.55, 6),
+        new MeshStandardMaterial({ color: 0x333333, metalness: 0.5 })
+      );
+      stoolLeg.position.y = 0.275;
+      group.add(stoolLeg);
+
+      scene.add(group);
+      this.customers.push({ group, bobPhase: i * 2.1 });
+    });
+  }
+
+  private buildStationLabels(scene: Object3D) {
+    // Floating indicator lights above each station
+    const stations = [
+      { name: 'rice', x: -1.8, color: 0xffffff },
+      { name: 'nori', x: -0.9, color: 0x44aa44 },
+      { name: 'fish', x: 0.0, color: 0xff6644 },
+      { name: 'topping', x: 0.9, color: 0x88cc44 },
+      { name: 'serve', x: 1.8, color: 0xffdd44 },
+    ];
+
+    stations.forEach((station, i) => {
+      // Small glowing indicator sphere above station
+      const indicator = new Mesh(
+        new SphereGeometry(0.04, 8, 6),
+        new MeshBasicMaterial({
+          color: station.color,
+          transparent: true,
+          opacity: 0.8,
+        })
+      );
+      indicator.position.set(station.x, 1.2, -1.6);
+      scene.add(indicator);
+      this.stationLabels.set(station.name, indicator);
+
+      // Key number indicator for browser mode (small ring)
+      const ring = new Mesh(
+        new RingGeometry(0.03, 0.05, 16),
+        new MeshBasicMaterial({
+          color: station.color,
+          transparent: true,
+          opacity: 0.5,
+          side: DoubleSide,
+        })
+      );
+      ring.position.set(station.x, 1.15, -1.58);
+      scene.add(ring);
+    });
+  }
+
+  private buildBonsai(scene: Object3D) {
+    const bonsaiGroup = new Group();
+    bonsaiGroup.position.set(2.8, 1.1, -2.7);
+
+    // Pot
+    const pot = new Mesh(
+      new CylinderGeometry(0.08, 0.06, 0.08, 12),
+      new MeshStandardMaterial({ color: 0x6b3a2a, roughness: 0.7 })
+    );
+    bonsaiGroup.add(pot);
+
+    // Trunk
+    const trunk = new Mesh(
+      new CylinderGeometry(0.015, 0.02, 0.15, 6),
+      new MeshStandardMaterial({ color: 0x4a3520, roughness: 0.8 })
+    );
+    trunk.position.y = 0.11;
+    trunk.rotation.z = 0.15;
+    bonsaiGroup.add(trunk);
+
+    // Foliage clusters
+    const foliageMat = new MeshStandardMaterial({
+      color: 0x2a6a2a,
+      roughness: 0.9,
+      emissive: 0x1a3a1a,
+      emissiveIntensity: 0.1,
+    });
+    const positions = [
+      [0.02, 0.2, 0],
+      [-0.04, 0.18, 0.02],
+      [0.05, 0.22, -0.01],
+      [0.0, 0.25, 0.01],
+    ];
+    positions.forEach(([x, y, z]) => {
+      const leaf = new Mesh(new SphereGeometry(0.04, 8, 6), foliageMat);
+      leaf.position.set(x, y, z);
+      leaf.scale.set(1.2, 0.6, 1.0);
+      bonsaiGroup.add(leaf);
+    });
+
+    scene.add(bonsaiGroup);
+  }
+
+  spawnScorePopup(x: number, y: number, z: number, points: number) {
+    // Visual floating score indicator
+    const color = points >= 500 ? 0xffdd44 : points >= 200 ? 0x44ddff : 0x44ff88;
+    const popup = new Mesh(
+      new SphereGeometry(0.03, 8, 6),
+      new MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.9,
+      })
+    );
+    popup.position.set(x, y, z);
+    // Scale based on points
+    const scale = 0.5 + Math.min(points / 500, 1.5);
+    popup.scale.setScalar(scale);
+    this.world.scene.add(popup);
+    this.scorePopups.push({ mesh: popup, age: 0, vy: 0.8 });
+  }
+
+  customerReact(happy: boolean) {
+    // Make customers bob when sushi is served
+    this.customers.forEach((c) => {
+      if (happy) {
+        c.bobPhase = 0; // Reset bob for visible reaction
+      }
+    });
+  }
+
   highlightStation(name: string, active: boolean) {
     const glow = this.stationGlows.get(name);
     if (glow) {
@@ -950,6 +1126,42 @@ export class EnvironmentSystem extends createSystem({}) {
     this.neonSigns.forEach((sign) => {
       const mat = sign.material as MeshBasicMaterial;
       mat.opacity = 0.7 + Math.sin(this.lanternTime * 2) * 0.3;
+    });
+
+    // Animate customers idle bobbing
+    this.customers.forEach((c) => {
+      c.bobPhase += delta * 1.5;
+      const bob = Math.sin(c.bobPhase) * 0.015;
+      c.group.children[1].position.y = 1.25 + bob; // head bobs
+    });
+
+    // Animate score popups
+    for (let i = this.scorePopups.length - 1; i >= 0; i--) {
+      const p = this.scorePopups[i];
+      p.age += delta;
+      p.mesh.position.y += p.vy * delta;
+      const mat = p.mesh.material as MeshBasicMaterial;
+      mat.opacity = Math.max(0, 0.9 * (1 - p.age / 1.2));
+      p.mesh.scale.multiplyScalar(1 + delta * 0.5);
+      if (p.age >= 1.2) {
+        this.world.scene.remove(p.mesh);
+        p.mesh.geometry.dispose();
+        mat.dispose();
+        this.scorePopups.splice(i, 1);
+      }
+    }
+
+    // Pulse station labels for active station
+    this.stationLabels.forEach((mesh, name) => {
+      const mat = mesh.material as MeshBasicMaterial;
+      const glow = this.stationGlows.get(name);
+      if (glow && glow.intensity > 1.0) {
+        mat.opacity = 0.5 + Math.sin(this.lanternTime * 6) * 0.4;
+        mesh.scale.setScalar(1.0 + Math.sin(this.lanternTime * 6) * 0.2);
+      } else {
+        mat.opacity = 0.4;
+        mesh.scale.setScalar(1.0);
+      }
     });
   }
 
@@ -1192,6 +1404,8 @@ export class GameSystem extends createSystem({}) {
     systemRefs.environment?.flashServe();
     systemRefs.environment?.clearAssembly();
     systemRefs.environment?.spawnSteam(0, 1.0, -0.8);
+    systemRefs.environment?.spawnScorePopup(0, 1.3, -0.5, points);
+    systemRefs.environment?.customerReact(true);
 
     // Update high score
     if (this.state.score > this.state.highScore) {
@@ -1286,6 +1500,7 @@ export class UISystem extends createSystem({}) {
   private gameOverPanel: UIKitMLAsset | null = null;
   private settingsPanel: UIKitMLAsset | null = null;
   private recipePanel: UIKitMLAsset | null = null;
+  private wavePanel: UIKitMLAsset | null = null;
   private initialized = false;
 
   init() {
@@ -1302,6 +1517,7 @@ export class UISystem extends createSystem({}) {
     this.gameOverPanel = this.world.getSceneObject<UIKitMLAsset>('game-over-panel') ?? null;
     this.settingsPanel = this.world.getSceneObject<UIKitMLAsset>('settings-panel') ?? null;
     this.recipePanel = this.world.getSceneObject<UIKitMLAsset>('recipe-panel') ?? null;
+    this.wavePanel = this.world.getSceneObject<UIKitMLAsset>('wave-panel') ?? null;
 
     this.wireMenuPanel();
     this.wireHudPanel();
@@ -1338,12 +1554,26 @@ export class UISystem extends createSystem({}) {
       if (game) {
         if (game.state.phase === 'playing') {
           game.pause();
-          this.hudPanel?.getElementById('btn-pause')?.setProperties({ text: '▶' });
+          this.showPause();
         } else if (game.state.phase === 'paused') {
           game.resume();
-          this.hudPanel?.getElementById('btn-pause')?.setProperties({ text: 'II' });
+          this.showOnly('playing');
         }
       }
+    });
+
+    // Wire wave/pause panel resume/quit buttons
+    this.wavePanel?.getElementById('btn-resume')?.addEventListener('click', () => {
+      systemRefs.audio?.playClick();
+      systemRefs.game?.resume();
+      this.showOnly('playing');
+    });
+    this.wavePanel?.getElementById('btn-quit-pause')?.addEventListener('click', () => {
+      systemRefs.audio?.playClick();
+      if (systemRefs.game) {
+        systemRefs.game.state.phase = 'menu';
+      }
+      this.showOnly('menu');
     });
   }
 
@@ -1421,6 +1651,7 @@ export class UISystem extends createSystem({}) {
     if (this.gameOverPanel) this.gameOverPanel.visible = (view === 'game-over');
     if (this.settingsPanel) this.settingsPanel.visible = (view === 'settings');
     if (this.recipePanel) this.recipePanel.visible = (view === 'recipe');
+    if (this.wavePanel) this.wavePanel.visible = (view === 'wave-complete' || view === 'paused');
   }
 
   updateHUD() {
@@ -1524,11 +1755,38 @@ export class UISystem extends createSystem({}) {
   }
 
   showWaveComplete() {
-    // Brief wave complete indication on HUD
+    const game = systemRefs.game;
+    if (!game) return;
+
+    this.showOnly('wave-complete');
+
+    // Update wave panel
+    this.wavePanel?.getElementById('wave-label')?.setProperties({ text: 'WAVE COMPLETE' });
+    this.wavePanel?.getElementById('wave-num')?.setProperties({ text: String(game.state.wave) });
+    this.wavePanel?.getElementById('clear-text')?.setProperties({ text: 'GREAT WORK!' });
+
+    const bonus = game.state.ordersFailed === 0 ? `PERFECT WAVE! +${100 * game.state.wave}` : ' ';
+    this.wavePanel?.getElementById('bonus-text')?.setProperties({ text: bonus });
+
+    // Hide resume/quit buttons (they're for pause)
+    this.wavePanel?.getElementById('btn-resume')?.setProperties({ display: 'none' });
+    this.wavePanel?.getElementById('btn-quit-pause')?.setProperties({ display: 'none' });
+
+    // Update HUD timer
     this.hudPanel?.getElementById('timer')?.setProperties({
       text: 'CLEAR!',
       color: '#44dd88',
     });
+  }
+
+  showPause() {
+    this.showOnly('paused');
+    this.wavePanel?.getElementById('wave-label')?.setProperties({ text: 'PAUSED' });
+    this.wavePanel?.getElementById('wave-num')?.setProperties({ text: 'II' });
+    this.wavePanel?.getElementById('clear-text')?.setProperties({ text: ' ' });
+    this.wavePanel?.getElementById('bonus-text')?.setProperties({ text: ' ' });
+    this.wavePanel?.getElementById('btn-resume')?.setProperties({ display: 'flex' });
+    this.wavePanel?.getElementById('btn-quit-pause')?.setProperties({ display: 'flex' });
   }
 
   showGameOver() {

@@ -61,6 +61,13 @@
       "content": { "type": "asset", "asset": "recipe-panel" },
       "transform": { "position": [0, 1.5, -2], "scale": 0.38 },
       "components": { "RayInteractable": {} }
+    },
+    {
+      "id": "wave-panel",
+      "name": "Wave Panel",
+      "content": { "type": "asset", "asset": "wave-panel" },
+      "transform": { "position": [0, 1.6, -1.8], "scale": 0.4 },
+      "components": { "RayInteractable": {} }
     }
   ]
 }

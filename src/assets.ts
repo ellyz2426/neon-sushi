@@ -34,4 +34,9 @@ export default defineAssets({
     type: AssetType.UIKitML,
     name: 'Recipe Panel',
   },
+  'wave-panel': {
+    url: publicAssetUrl('ui/wave.uikitml'),
+    type: AssetType.UIKitML,
+    name: 'Wave Panel',
+  },
 });
