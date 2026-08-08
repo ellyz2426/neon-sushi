@@ -726,6 +726,74 @@ export class EnvironmentSystem extends createSystem({}) {
     neonBorder.position.set(0, 2.8, -2.95);
     scene.add(neonBorder);
     this.neonSigns.push(neonBorder);
+
+    // Tea cups on counter for customers
+    const teaMat = new MeshStandardMaterial({ color: 0x336655, roughness: 0.3 });
+    const teaLiquid = new MeshStandardMaterial({
+      color: 0x88aa44,
+      roughness: 0.2,
+      emissive: 0x445522,
+      emissiveIntensity: 0.1,
+    });
+    for (let i = 0; i < 3; i++) {
+      const cupGroup = new Group();
+      const cup = new Mesh(new CylinderGeometry(0.025, 0.02, 0.04, 10), teaMat);
+      const liquid = new Mesh(new CylinderGeometry(0.022, 0.022, 0.005, 10), teaLiquid);
+      liquid.position.y = 0.018;
+      cupGroup.add(cup);
+      cupGroup.add(liquid);
+      cupGroup.position.set(-1.2 + i * 1.2, 0.91, -0.3);
+      scene.add(cupGroup);
+    }
+
+    // Wall scroll decorations (vertical scrolls on back wall)
+    const scrollMat = new MeshStandardMaterial({
+      color: 0xeeddcc,
+      roughness: 0.85,
+      side: DoubleSide,
+    });
+    const scrollBorderMat = new MeshStandardMaterial({ color: 0x4a3520, roughness: 0.7 });
+    for (let i = 0; i < 2; i++) {
+      const scrollGroup = new Group();
+      scrollGroup.position.set(i === 0 ? -1.5 : 1.5, 2.2, -2.97);
+
+      // Scroll body
+      const scrollBody = new Mesh(new PlaneGeometry(0.3, 0.8), scrollMat);
+      scrollGroup.add(scrollBody);
+
+      // Top roller
+      const roller = new Mesh(new CylinderGeometry(0.015, 0.015, 0.34, 8), scrollBorderMat);
+      roller.rotation.z = Math.PI / 2;
+      roller.position.y = 0.4;
+      scrollGroup.add(roller);
+
+      // Bottom weight
+      const weight = new Mesh(new CylinderGeometry(0.012, 0.012, 0.32, 8), scrollBorderMat);
+      weight.rotation.z = Math.PI / 2;
+      weight.position.y = -0.4;
+      scrollGroup.add(weight);
+
+      // Decorative circle (kanji placeholder)
+      const kanji = new Mesh(
+        new RingGeometry(0.06, 0.08, 16),
+        new MeshStandardMaterial({
+          color: 0x332222,
+          side: DoubleSide,
+        })
+      );
+      kanji.position.z = 0.001;
+      scrollGroup.add(kanji);
+
+      scene.add(scrollGroup);
+    }
+
+    // Ceiling beams (dark wood)
+    const beamMat = new MeshStandardMaterial({ color: 0x1a0e08, roughness: 0.8 });
+    for (let i = 0; i < 4; i++) {
+      const beam = new Mesh(new BoxGeometry(12, 0.08, 0.12), beamMat);
+      beam.position.set(0, 3.9, -3 + i * 2);
+      scene.add(beam);
+    }
   }
 
   private buildLighting(scene: Object3D) {
@@ -1061,6 +1129,19 @@ export class EnvironmentSystem extends createSystem({}) {
         c.bobPhase = 0; // Reset bob for visible reaction
       }
     });
+  }
+
+  animateChopsticks() {
+    // Quick chopstick crossing animation
+    if (!this.chopstickL || !this.chopstickR) return;
+    const origLY = 0.1;
+    const origRY = -0.1;
+    this.chopstickL.rotation.y = 0.3;
+    this.chopstickR.rotation.y = -0.3;
+    setTimeout(() => {
+      if (this.chopstickL) this.chopstickL.rotation.y = origLY;
+      if (this.chopstickR) this.chopstickR.rotation.y = origRY;
+    }, 150);
   }
 
   highlightStation(name: string, active: boolean) {
@@ -1510,6 +1591,7 @@ export class GameSystem extends createSystem({}) {
         this.state.assemblyIngredients.push(stationType);
         systemRefs.environment?.addIngredientToBoard(stationType, this.state.currentStepIndex);
         systemRefs.audio?.playChop();
+        systemRefs.environment?.animateChopsticks();
         this.state.currentStepIndex++;
         this.highlightNextStation();
         systemRefs.ui?.updateOrderPanel();
@@ -1957,14 +2039,34 @@ export class UISystem extends createSystem({}) {
       ? Math.round((game.state.sushiServed / game.state.totalOrders) * 100)
       : 0;
 
-    // Rank system
-    const served = game.state.sushiServed;
+    // Lifetime mastery — persistent across games
+    let lifetimeServed = 0;
+    let lifetimeGames = 0;
+    let bestWave = 0;
+    try {
+      lifetimeServed = parseInt(localStorage.getItem('neon-sushi-lifetime-served') ?? '0', 10);
+      lifetimeGames = parseInt(localStorage.getItem('neon-sushi-lifetime-games') ?? '0', 10);
+      bestWave = parseInt(localStorage.getItem('neon-sushi-best-wave') ?? '0', 10);
+    } catch (_e) { /* ignore */ }
+
+    lifetimeServed += game.state.sushiServed;
+    lifetimeGames += 1;
+    bestWave = Math.max(bestWave, game.state.wave - 1);
+
+    try {
+      localStorage.setItem('neon-sushi-lifetime-served', String(lifetimeServed));
+      localStorage.setItem('neon-sushi-lifetime-games', String(lifetimeGames));
+      localStorage.setItem('neon-sushi-best-wave', String(bestWave));
+    } catch (_e) { /* ignore */ }
+
+    // Rank based on lifetime served
     let rank = 'Apprentice';
-    if (served >= 50) rank = 'Sushi Legend';
-    else if (served >= 35) rank = 'Master Chef';
-    else if (served >= 25) rank = 'Head Chef';
-    else if (served >= 15) rank = 'Sous Chef';
-    else if (served >= 8) rank = 'Line Cook';
+    if (lifetimeServed >= 500) rank = 'Sushi Legend';
+    else if (lifetimeServed >= 300) rank = 'Master Chef';
+    else if (lifetimeServed >= 150) rank = 'Head Chef';
+    else if (lifetimeServed >= 75) rank = 'Sous Chef';
+    else if (lifetimeServed >= 30) rank = 'Line Cook';
+    else if (lifetimeServed >= 10) rank = 'Prep Cook';
 
     this.gameOverPanel?.getElementById('final-score')?.setProperties({
       text: String(game.state.score),
