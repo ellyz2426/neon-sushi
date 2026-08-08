@@ -1213,6 +1213,13 @@ export class EnvironmentSystem extends createSystem({}) {
   serveSushi(recipeName: string) {
     // Create sushi model and put it on conveyor
     const sushiGroup = new Group();
+    const order = systemRefs.game?.state.currentOrder;
+    const fishColor = order ? (FISH_COLORS[order.fish] ?? 0xff7744) : 0xff7744;
+    const toppingColor = order ? (TOPPING_COLORS[order.topping] ?? 0x88cc44) : 0x88cc44;
+
+    // Plate colors cycle
+    const plateColors = [0xdddddd, 0xccbbaa, 0xaaccdd, 0xddccbb];
+    const plateColor = plateColors[Math.floor(Math.random() * plateColors.length)];
 
     switch (recipeName) {
       case 'nigiri': {
@@ -1222,7 +1229,7 @@ export class EnvironmentSystem extends createSystem({}) {
         );
         const fishTop = new Mesh(
           new BoxGeometry(0.07, 0.015, 0.035),
-          new MeshStandardMaterial({ color: 0xff7744, roughness: 0.4 })
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.4 })
         );
         fishTop.position.y = 0.02;
         sushiGroup.add(riceBase);
@@ -1242,7 +1249,7 @@ export class EnvironmentSystem extends createSystem({}) {
         riceInner.rotation.x = Math.PI / 2;
         const fishCenter = new Mesh(
           new CylinderGeometry(0.01, 0.01, 0.042, 8),
-          new MeshStandardMaterial({ color: 0xff6644, roughness: 0.4 })
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.4 })
         );
         fishCenter.rotation.x = Math.PI / 2;
         sushiGroup.add(roll);
@@ -1258,33 +1265,61 @@ export class EnvironmentSystem extends createSystem({}) {
         cone.rotation.z = -Math.PI / 6;
         const filling = new Mesh(
           new SphereGeometry(0.02, 8, 6),
-          new MeshStandardMaterial({ color: 0xff7744, roughness: 0.4 })
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.4 })
         );
         filling.position.set(0, 0.04, 0);
+        // Topping garnish
+        const garnish = new Mesh(
+          new SphereGeometry(0.008, 6, 4),
+          new MeshStandardMaterial({ color: toppingColor, roughness: 0.5 })
+        );
+        garnish.position.set(0.01, 0.05, 0);
         sushiGroup.add(cone);
         sushiGroup.add(filling);
+        sushiGroup.add(garnish);
         break;
       }
       case 'sashimi': {
         const slice1 = new Mesh(
           new BoxGeometry(0.06, 0.01, 0.03),
-          new MeshStandardMaterial({ color: 0xff7744, roughness: 0.3 })
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.3 })
         );
         const slice2 = new Mesh(
           new BoxGeometry(0.06, 0.01, 0.03),
-          new MeshStandardMaterial({ color: 0xff7744, roughness: 0.3 })
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.3 })
         );
         slice2.position.set(0.02, 0, 0.025);
+        const slice3 = new Mesh(
+          new BoxGeometry(0.06, 0.01, 0.03),
+          new MeshStandardMaterial({ color: fishColor, roughness: 0.3 })
+        );
+        slice3.position.set(-0.01, 0, -0.025);
         sushiGroup.add(slice1);
         sushiGroup.add(slice2);
+        sushiGroup.add(slice3);
         break;
       }
     }
 
-    // Plate
+    // Garnish — wasabi dot and pickled ginger
+    const wasabi = new Mesh(
+      new SphereGeometry(0.008, 6, 4),
+      new MeshStandardMaterial({ color: 0x88cc44, roughness: 0.5 })
+    );
+    wasabi.position.set(0.05, 0.01, 0.02);
+    sushiGroup.add(wasabi);
+
+    const ginger = new Mesh(
+      new BoxGeometry(0.02, 0.003, 0.015),
+      new MeshStandardMaterial({ color: 0xffccaa, roughness: 0.5 })
+    );
+    ginger.position.set(0.05, 0.01, -0.02);
+    sushiGroup.add(ginger);
+
+    // Plate with color variety
     const plate = new Mesh(
       new CylinderGeometry(0.08, 0.07, 0.01, 16),
-      new MeshStandardMaterial({ color: 0xdddddd, roughness: 0.2, metalness: 0.1 })
+      new MeshStandardMaterial({ color: plateColor, roughness: 0.2, metalness: 0.1 })
     );
     sushiGroup.add(plate);
     sushiGroup.position.set(0, 0.95, -0.2);
